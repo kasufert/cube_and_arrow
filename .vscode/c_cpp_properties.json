@@ -1,0 +1,27 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${default}"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "GLEW_BUILD",
+                "WINDOWS"
+            ],
+            "windowsSdkVersion": "10.0.19041.0",
+            "intelliSenseMode": "windows-msvc-x64",
+            "compilerArgs": [
+                "/external:anglebrackets",
+                "/external:W0",
+                "/W4"
+            ],
+            "cStandard": "c23",
+            "cppStandard": "c++23"
+        }
+    ],
+    "version": 4
+}

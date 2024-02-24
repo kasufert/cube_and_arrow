@@ -1,0 +1,42 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Main Launch",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/dbg/main.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/dbg",
+            "environment": [],
+            "console": "integratedTerminal",
+            "preLaunchTask": "Build Windows",
+            "presentation": {
+                "hidden": false,
+                "group": "",
+                "order": 1,
+            }
+        },
+        {
+            "name": "Current File Launch",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/dbg/${fileBasenameNoExtension}.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/dbg",
+            "environment": [],
+            "console": "integratedTerminal",
+            "preLaunchTask": "Build Windows Current File",
+            "presentation": {
+                "hidden": false,
+                "group": "",
+                "order": 1,
+            },
+        }
+    ]
+}

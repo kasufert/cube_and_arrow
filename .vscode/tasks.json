@@ -1,0 +1,50 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Windows",
+            "type": "shell",
+            "command": "${workspaceFolder}/build.ps1",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                {
+                    "owner": "cpp",
+                    "fileLocation": [
+                        "absolute",
+                    ],
+                    "base": "$msCompile"
+                },
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true,
+            },
+        },
+        {
+            "label": "Build Windows Current File",
+            "type": "shell",
+            "command": "${workspaceFolder}/buildcurrent.ps1",
+            "options": {
+                "cwd": "${workspaceFolder}",
+            },
+            "args": [
+                "${fileBasenameNoExtension}"
+            ],
+            "problemMatcher": [
+                {
+                    "owner": "cpp",
+                    "fileLocation": [
+                        "absolute",
+                    ],
+                    "base": "$msCompile"
+                },
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false,
+            },
+        }
+    ]
+}
