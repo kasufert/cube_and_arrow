@@ -4,12 +4,10 @@
 
 
 Shape::Shape(const ShapeData& sd)
+    : vbo(Buffer(GL_ARRAY_BUFFER, sd.vertsSize(), sd.verts, GL_STATIC_DRAW, sd.numVerts)), ibo(Buffer(GL_ELEMENT_ARRAY_BUFFER, sd.indsSize(), sd.indices, GL_STATIC_DRAW, sd.numIndices))
 {
     GLCALL(glGenVertexArrays(1, &vao));
     GLCALL(glBindVertexArray(vao));
-
-    vbo = Buffer(GL_ARRAY_BUFFER, sd.vertsSize(), sd.verts, GL_STATIC_DRAW, sd.numVerts);
-    ibo = Buffer(GL_ELEMENT_ARRAY_BUFFER, sd.indsSize(), sd.indices, GL_STATIC_DRAW, sd.numIndices);
 
     // VBO
     vbo.bind();
@@ -40,9 +38,14 @@ void Shape::Draw(glm::mat4 worldToProjection, Shader& shader)
 {
     GLCALL(glBindVertexArray(vao));
     ibo.bind();
+
+    uint slot = 0;
+    tex.bind(slot);
+    shader.set("uTexture", slot);
     glm::mat4 mat = worldToProjection * transform.matrix();
     shader.set("uCompleteMatrix", mat);
     GLCALL(glDrawElements(GL_TRIANGLES, ibo.count, GL_UNSIGNED_SHORT, 0));
+    tex.unbind();
 
     // Cleanup
     GLCALL(glBindVertexArray(0));
@@ -50,8 +53,6 @@ void Shape::Draw(glm::mat4 worldToProjection, Shader& shader)
 }
 
 Shape::Shape(std::function<ShapeData(void)> shapeMaker)
+    : Shape(shapeMaker())
 {
-    ShapeData sd = shapeMaker();
-    *this = Shape(sd);
-    sd.cleanup();
 }

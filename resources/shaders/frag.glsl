@@ -1,15 +1,11 @@
 #version 330 core
 out vec4 FragColor;
-// uniform vec2 mousePos;
-// uniform vec2 wndSize;
-// uniform float theta; // -pi to pi
 uniform float u_hue; // 0 to 1
-in vec4 pos;
-in vec4 color;
-in vec2 texCoord;
+uniform sampler2D uTexture;
+in vec4 vPos;
+in vec4 vColor;
+in vec2 vTexCoord;
 
-uniform sampler2D tex1;
-uniform sampler2D tex2;
 
 #define PI 3.1415926535897932384626433832795f
 #define TWOPI 6.28318530718f
@@ -67,5 +63,6 @@ vec4 hsv2rgb(float hue, float sat, float val)
 
 void main()
 {
-	FragColor = color;
+    vec4 texColor = texture(uTexture, vTexCoord);
+    FragColor = texColor;
 }

@@ -36,14 +36,14 @@ ShapeData ShapeGenerator::makeCube()
     vec2 noTex(0.0, 0.0);
     Vertex myCube[] =
     {
-        vec3(-1.0, -1.0, -1.0), red,    noTex,// CBL - 0
-        vec3(+1.0, -1.0, -1.0), green,  noTex,// CBR - 1
-        vec3(-1.0, +1.0, -1.0), blue,   noTex,// CTL
-        vec3(+1.0, +1.0, -1.0), cyan,    noTex,// CTR
-        vec3(-1.0, -1.0, +1.0), yellow,  noTex,// FBL
-        vec3(+1.0, -1.0, +1.0), magenta,   noTex,// FBR
-        vec3(-1.0, +1.0, +1.0), black,    noTex,// FTL
-        vec3(+1.0, +1.0, +1.0), white,  noTex // FTR
+        vec3(-1.0, -1.0, -1.0), red,        vec2(1.0, 0.0),// FBR - 0
+        vec3(+1.0, -1.0, -1.0), green,      vec2(0.0, 0.0),// FBL - 1
+        vec3(-1.0, +1.0, -1.0), blue,       vec2(1.0, 1.0),// FTR
+        vec3(+1.0, +1.0, -1.0), cyan,       vec2(0.0, 1.0),// FTL
+        vec3(-1.0, -1.0, +1.0), white,      vec2(0.0, 0.0),// CBL
+        vec3(+1.0, -1.0, +1.0), white,      vec2(1.0, 0.0),// CBR
+        vec3(-1.0, +1.0, +1.0), white,      vec2(0.0, 1.0),// CTL
+        vec3(+1.0, +1.0, +1.0), white,      vec2(1.0, 1.0) // CTR
     };
     cube.numVerts = NUM_ELEMS(myCube);
     cube.verts = new Vertex[cube.numVerts];
@@ -70,6 +70,76 @@ ShapeData ShapeGenerator::makeCube()
 
     return cube;
 }
+
+ShapeData ShapeGenerator::makeTexCube()
+{
+    using glm::vec3, glm::vec2, glm::vec4;
+    ShapeData cube;
+    vec3 bbl(+1.0, -1.0, -1.0);
+    vec3 bbr(-1.0, -1.0, -1.0);
+    vec3 btl(+1.0, +1.0, -1.0);
+    vec3 btr(-1.0, +1.0, -1.0);
+    vec3 fbl(-1.0, -1.0, +1.0);
+    vec3 fbr(+1.0, -1.0, +1.0);
+    vec3 ftl(-1.0, +1.0, +1.0);
+    vec3 ftr(+1.0, +1.0, +1.0);
+    vec2 bl(0.0, 0.0);
+    vec2 br(1.0, 0.0);
+    vec2 tl(0.0, 1.0);
+    vec2 tr(1.0, 1.0);
+    Vertex myCube[] =
+    {
+        // Front face
+        fbl, clear, bl, // 0    
+        fbr, clear, br, // 1
+        ftl, clear, tl, // 2
+        ftr, clear, tr, // 3
+        // Back face
+        bbl, clear, bl, // 4
+        bbr, clear, br, // 5
+        btl, clear, tl, // 6
+        btr, clear, tr, // 7
+        // Top face
+        ftl, clear, bl, // 8
+        ftr, clear, br, // 9
+        btl, clear, tr, // 10
+        btr, clear, tl, // 11
+        // Bottom face
+        fbl, clear, br, // 12
+        fbr, clear, bl, // 13
+        bbl, clear, tl, // 14
+        bbr, clear, tr, // 15
+        // Right face
+        ftr, clear, tl, // 16
+        bbl, clear, br, // 17
+        // Left face
+        ftl, clear, tr, // 18
+        bbr, clear, bl, // 19
+    };
+
+    GLushort indices[] =
+    {
+        0, 1, 2,
+        1, 2, 3,
+        4, 5, 6,
+        5, 6, 7,
+        8, 9, 10,
+        8, 11, 10,
+        12, 13, 14,
+        12, 15, 14,
+        13, 16, 10,
+        13, 17, 10,
+        12, 18, 11,
+        12, 19, 11
+    };
+
+    cube.setVerts(myCube, sizeof(myCube));
+    cube.setInds(indices, sizeof(indices));
+
+    return cube;
+
+}
+
 
 ShapeData ShapeGenerator::makeArrow()
 {

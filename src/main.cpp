@@ -12,6 +12,8 @@
 using glm::vec2, glm::vec3, glm::vec4, glm::mat4;
 float fov = 90.f;
 float cube1z = -3.0f;
+bool shouldClose = false;
+
 
 vec3 camPos;
 float camSpeed = 20.0f;
@@ -20,9 +22,6 @@ float pitch = 0.0f;
 float yaw = 0.0f;
 float sensitivity = .4f;
 u_int fps_last = 0;
-
-Shape cube;
-Shape arrow;
 
 bool trapped = true;
 bool fullscreen = false;
@@ -34,8 +33,6 @@ sf::Text debugText;
 WINDOWPLACEMENT g_wpPrev;
 
 float deltaTimeSec;
-
-std::vector<Shape> shapes;
 
 
 bool Initialize(sf::RenderWindow& window)
@@ -71,7 +68,7 @@ bool Initialize(sf::RenderWindow& window)
 
 
 
-void Input(sf::RenderWindow& window, bool& wireframe, glm::vec2& mPos)
+void Input(sf::RenderWindow& window, bool& wireframe, glm::vec2& mPos, std::vector<Shape>& shapes)
 {
 #define IsKey(k) sf::Keyboard::isKeyPressed(k)
     using enum sf::Keyboard::Key;
@@ -106,19 +103,19 @@ void Input(sf::RenderWindow& window, bool& wireframe, glm::vec2& mPos)
     }
     if (IsKey(I))
     {
-        arrow.transform.moveBy({ 0.0f, 0.0f, 1.0f * deltaTimeSec });
+        shapes.at(0).transform.moveBy({ 0.0f, 0.0f, 1.0f * deltaTimeSec });
     }
     if (IsKey(K))
     {
-        arrow.transform.moveBy({ 0.0f, 0.0f, -1.0f * deltaTimeSec });
+        shapes.at(0).transform.moveBy({ 0.0f, 0.0f, -1.0f * deltaTimeSec });
     }
     if (IsKey(J))
     {
-        arrow.transform.moveBy({ 1.0f * deltaTimeSec, 0.0f, 0.0f });
+        shapes.at(0).transform.moveBy({ 1.0f * deltaTimeSec, 0.0f, 0.0f });
     }
     if (IsKey(L))
     {
-        arrow.transform.moveBy({ -1.0f * deltaTimeSec, 0.0f, 0.0f });
+        shapes.at(0).transform.moveBy({ -1.0f * deltaTimeSec, 0.0f, 0.0f });
     }
     // Camera movement
     if (trapped && window.hasFocus())
@@ -133,7 +130,7 @@ void Input(sf::RenderWindow& window, bool& wireframe, glm::vec2& mPos)
         if (e.type == sf::Event::Closed)
         {
             fmt::print("Goodbye\n");
-            window.close();
+            shouldClose = true;
         }
         if (e.type == sf::Event::Resized)
         {
@@ -173,18 +170,19 @@ void Input(sf::RenderWindow& window, bool& wireframe, glm::vec2& mPos)
 
 uint indexCount = 0;
 
-void VertexSpecification()
+void VertexSpecification(std::vector<Shape>& shapes)
 {
 
-    arrow = Shape(ShapeGenerator::makeArrow);
-    cube = Shape(ShapeGenerator::makeCube);
-    // Cleanup
+    shapes.emplace_back(ShapeGenerator::makeArrow);
+
+    shapes.emplace_back(ShapeGenerator::makeTexCube);
+    shapes.back().tex = Texture("../resources/textures/wall_marked.jpg");
 }
 
-void Draw(bool wireframe, Shader& shader, sf::Window& window)
+void Draw(bool wireframe, Shader& shader, sf::Window& window, std::vector<Shape>& shapes)
 {
     shader.use();
-    GLCALL(glClearColor(.062f, .092f, 0.13f, .180f));
+    GLCALL(glClearColor(119.f / 255.f, 181.f / 255.f, 254.f / 255.f, .180f));
     GLCALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     GLCALL(glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL));
 
@@ -199,9 +197,10 @@ void Draw(bool wireframe, Shader& shader, sf::Window& window)
     mat4 worldToProj = viewToProjMat * worldToViewMat;
 
 
-
-    arrow.Draw(worldToProj, shader);
-    cube.Draw(worldToProj, shader);
+    for (Shape& shape : shapes)
+    {
+        shape.Draw(worldToProj, shader);
+    }
 
 }
 
@@ -236,53 +235,60 @@ int main()
     }
     GLCALL(;);
     sf::Clock clock;
+    { // OpenGL objects should live in this scope
+        std::vector<Shape> shapes;
 
-    VertexSpecification();
-    Shader shader(vertShaderPath, fragShaderPath);
+        VertexSpecification(shapes);
+        Shader shader(vertShaderPath, fragShaderPath);
 
 
 
-    bool wireframe = false;
-    vec2 mPos;
+        bool wireframe = false;
+        vec2 mPos;
 
-    sf::Font font;
-    font.loadFromFile("C:/Windows/Fonts/consola.ttf");
-    debugText.setCharacterSize(24.f);
-    debugText.setFillColor(sf::Color::White);
-    debugText.setFont(font);
+        sf::Font font;
+        font.loadFromFile("C:/Windows/Fonts/consola.ttf");
+        debugText.setCharacterSize(24.f);
+        debugText.setFillColor(sf::Color::White);
+        debugText.setOutlineThickness(2.f);
+        debugText.setOutlineColor(sf::Color::Black);
+        debugText.setFont(font);
 
-    std::vector<sf::Drawable*> drawables;
-    drawables.push_back(&debugText);
+        std::vector<sf::Drawable*> drawables;
+        drawables.push_back(&debugText);
 
-    u_int accumulatedFrames = 0;
-    sf::Clock frameTimer;
+        u_int accumulatedFrames = 0;
+        sf::Clock frameTimer;
 
-    while (window.isOpen())
-    {
-        accumulatedFrames += 1;
-        deltaTimeSec = frameTimer.getElapsedTime().asSeconds() / (float)accumulatedFrames;
-        if (frameTimer.getElapsedTime().asSeconds() > 1.f)
+        while (!shouldClose)
         {
-            fps_last = accumulatedFrames;
-            accumulatedFrames = 0;
-            frameTimer.restart();
+            accumulatedFrames += 1;
+            deltaTimeSec = frameTimer.getElapsedTime().asSeconds() / (float)accumulatedFrames;
+            if (frameTimer.getElapsedTime().asSeconds() > 1.f)
+            {
+                fps_last = accumulatedFrames;
+                accumulatedFrames = 0;
+                frameTimer.restart();
+            }
+
+
+
+        // OpenGL draw
+        // window.setActive(true);
+            Draw(wireframe, shader, window, shapes);
+
+
+
+            DrawSFMLObjects(window, drawables);
+
+
+            window.display();
+
+            Input(window, wireframe, mPos, shapes);
         }
-
-
-
-    // OpenGL draw
-    // window.setActive(true);
-        Draw(wireframe, shader, window);
-
-
-
-        DrawSFMLObjects(window, drawables);
-
-
-        window.display();
-
-        Input(window, wireframe, mPos);
     }
+
+    window.close();
 
 
     return 0;

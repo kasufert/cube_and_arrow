@@ -64,6 +64,14 @@
         "xtree": "cpp",
         "xutility": "cpp",
         "set": "cpp",
-        "source_location": "cpp"
+        "source_location": "cpp",
+        "list": "cpp",
+        "unordered_map": "cpp",
+        "fstream": "cpp",
+        "functional": "cpp",
+        "iostream": "cpp",
+        "istream": "cpp",
+        "sstream": "cpp",
+        "xhash": "cpp"
     }
 }

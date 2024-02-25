@@ -9,6 +9,7 @@ class Shape
     Buffer ibo;
 public:
     Transform transform;
+    Texture tex;
     Shape();
     Shape(const ShapeData& sd);
     Shape(std::function<ShapeData(void)> shapeMaker);

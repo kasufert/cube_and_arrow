@@ -79,6 +79,20 @@ bool Shader::set(const std::string& name, float value)
 }
 
 template<>
+bool Shader::set(const std::string& name, int value)
+{
+    GLuint loc = GLCALL(glGetUniformLocation(id, name.c_str()));
+    if (loc == -1)
+    {
+        fmt::print("Uniform \"{}\" not found or is invalid.\n", name);
+        return false;
+    }
+    use();
+    GLCALL(glUniform1i(loc, value));
+    return true;
+}
+
+template<>
 bool Shader::set(const std::string& name, glm::vec2 value)
 {
     GLuint loc = GLCALL(glGetUniformLocation(id, name.c_str()));

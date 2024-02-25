@@ -14,6 +14,33 @@ Buffer::Buffer(GLenum target, GLsizeiptr size, void* data, GLenum usage, uint co
     GLCALL(glBufferData(target, size, data, usage));
 }
 
+Buffer::Buffer(Buffer&& other)
+{
+    id = other.id;
+    target = other.target;
+    size = other.size;
+    count = other.count;
+    other.id = 0;
+}
+
+Buffer& Buffer::operator=(Buffer&& other)
+{
+    id = other.id;
+    target = other.target;
+    size = other.size;
+    count = other.count;
+    other.id = 0;
+    return *this;
+}
+
+Buffer::~Buffer()
+{
+    if (id != 0)
+    {
+        GLCALL(glDeleteBuffers(1, &id));
+    }
+}
+
 void Buffer::bind()
 {
     GLCALL(glBindBuffer(target, id));
